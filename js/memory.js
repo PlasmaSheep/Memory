@@ -21,7 +21,7 @@
    */
 
   function extend( a, b ) {
-    for( var key in b ) { 
+    for( var key in b ) {
       if( b.hasOwnProperty( key ) ) {
         a[key] = b[key];
       }
@@ -66,68 +66,44 @@
     cards : [
       {
         id : 1,
-        img: "img/default/monsters-01.png"
+        img1: "img/default/monsters-01.png",
+        img2: "img/default/monsters-02.png"
       },
       {
         id : 2,
-        img: "img/default/monsters-02.png"
+        img1: "img/default/monsters-03.png",
+        img2: "img/default/monsters-04.png"
       },
       {
         id : 3,
-        img: "img/default/monsters-03.png"
+        img1: "img/default/monsters-05.png",
+        img2: "img/default/monsters-06.png"
       },
       {
         id : 4,
-        img: "img/default/monsters-04.png"
+        img1: "img/default/monsters-07.png",
+        img2: "img/default/monsters-08.png"
       },
       {
         id : 5,
-        img: "img/default/monsters-05.png"
+        img1: "img/default/monsters-09.png",
+        img2: "img/default/monsters-10.png"
       },
       {
         id : 6,
-        img: "img/default/monsters-06.png"
+        img1: "img/default/monsters-11.png",
+        img2: "img/default/monsters-12.png"
       },
       {
         id : 7,
-        img: "img/default/monsters-07.png"
+        img1: "img/default/monsters-13.png",
+        img2: "img/default/monsters-14.png"
       },
       {
         id : 8,
-        img: "img/default/monsters-08.png"
+        img1: "img/default/monsters-15.png",
+        img2: "img/default/monsters-16.png"
       },
-      {
-        id : 9,
-        img: "img/default/monsters-09.png"
-      },
-      {
-        id : 10,
-        img: "img/default/monsters-10.png"
-      },
-      {
-        id : 11,
-        img: "img/default/monsters-11.png"
-      },
-      {
-        id : 12,
-        img: "img/default/monsters-12.png"
-      },
-      {
-        id : 13,
-        img: "img/default/monsters-13.png"
-      },
-      {
-        id : 14,
-        img: "img/default/monsters-14.png"
-      },
-      {
-        id : 15,
-        img: "img/default/monsters-15.png"
-      },
-      {
-        id : 16,
-        img: "img/default/monsters-16.png"
-      }
     ],
     onGameStart : function() { return false; },
     onGameEnd : function() { return false; }
@@ -217,8 +193,6 @@
       <h3 class="mg__start-screen--sub-heading">Select Level</h3>\
       <ul class="mg__start-screen--level-select">\
       <li><span data-level="1">Level 1 - Easy (4 x 2)</span></li>\
-      <li><span data-level="2">Level 2 - Medium (6 x 3)</span></li>\
-      <li><span data-level="3">Level 3 - Hard (8 x 4)</span></li>\
       </ul>';
     this.gameStartScreen.innerHTML = this.gameStartScreenHTML;
     this.game.appendChild(this.gameStartScreen);
@@ -298,10 +272,18 @@
     this.gridX = this.level * 2 + 2;
     this.gridY = this.gridX / 2;
     this.numTiles = this.gridX * this.gridY;
-    this.halfNumTiles = this.numTiles/2;
     this.newCards = [];
-    for ( var i = 0; i < this.halfNumTiles; i++ ) {
-      this.newCards.push(this.cards[i], this.cards[i]);
+    for ( var i = 0; i < this.numTiles / 2; i++ ) {
+      var newCard1 = {
+        "id": this.cards[i].id,
+        "img": this.cards[i].img1,
+      }
+      var newCard2 = {
+        "id": this.cards[i].id,
+        "img": this.cards[i].img2,
+      }
+
+      this.newCards.push(newCard1, newCard2);
     }
     this.newCards = shuffle(this.newCards);
     this.tilesHTML = '';
@@ -342,7 +324,7 @@
    * This function takes care of the "events", which is basically the clicking
    * of tiles. Tiles need to be checked if flipped or not, flipped if possible,
    * and if zero, one, or two cards are flipped. When two cards are flipped, we
-   * have to check for matches and mismatches. The _gameCardsMatch and 
+   * have to check for matches and mismatches. The _gameCardsMatch and
    * _gameCardsMismatch functions perform two separate sets of functions, and are
    * thus separated below.
    */
