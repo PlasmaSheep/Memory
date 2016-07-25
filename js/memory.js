@@ -102,9 +102,13 @@
       {
         id : 8,
         img1: "img/default/monsters-15.png",
-        img2: "img/default/monsters-16.png"
+      },
+      {
+        id : 8,
+        img1: "img/default/monsters-16.png"
       },
     ],
+    alwaysFlipped: false,
     onGameStart : function() { return false; },
     onGameEnd : function() { return false; }
   }
@@ -273,29 +277,54 @@
     this.gridY = this.gridX / 2;
     this.numTiles = this.gridX * this.gridY;
     this.newCards = [];
-    for ( var i = 0; i < this.numTiles / 2; i++ ) {
+    this.numMatches = 0;
+    var present_ids = {}
+    for ( var i = 0; this.newCards.length < this.numTiles; i++ ) {
+      present_ids[this.cards[i].id] = 0
       var newCard1 = {
         "id": this.cards[i].id,
         "img": this.cards[i].img1,
       }
-      var newCard2 = {
-        "id": this.cards[i].id,
-        "img": this.cards[i].img2,
-      }
 
-      this.newCards.push(newCard1, newCard2);
+      this.newCards.push(newCard1)
+
+      if(this.cards[i].img2) {
+          var newCard2 = {
+              "id": this.cards[i].id,
+              "img": this.cards[i].img2,
+          }
+          this.newCards.push(newCard2)
+      }
     }
     this.newCards = shuffle(this.newCards);
     this.tilesHTML = '';
+    this.maxNumMatches = 0
     for ( var i = 0; i < this.numTiles; i++  ) {
+      var id = this.newCards[i].id
+      if(!present_ids[id]) {
+        present_ids[id] = 1;
+      } else {
+        present_ids[id]++;
+      }
+      if(present_ids[id] > 1) {
+        this.maxNumMatches++
+      }
       var n = i + 1;
-      this.tilesHTML += '<div class="mg__tile mg__tile-' + n + '">\
-        <div class="mg__tile--inner" data-id="' + this.newCards[i]["id"] + '">\
+      this.tilesHTML += '<div class="mg__tile mg__tile-' + n + '">';
+
+      if(this.options.alwaysFlipped) {
+        this.tilesHTML += '<div class="mg__tile--inner alwaysflipped" data-id="' + this.newCards[i]["id"] + '">\
+        <span class="mg__tile--alwaysflipped"><img src="' + this.newCards[i]["img"] + '"></span>';
+      }
+      else {
+        this.tilesHTML += '<div class="mg__tile--inner" data-id="' + this.newCards[i]["id"] + '">\
         <span class="mg__tile--outside"></span>\
-        <span class="mg__tile--inside"><img src="' + this.newCards[i]["img"] + '"></span>\
-        </div>\
+        <span class="mg__tile--inside"><img src="' + this.newCards[i]["img"] + '"></span>';
+      }
+      this.tilesHTML += '</div>\
         </div>';
     }
+
     this.gameContents.innerHTML = this.tilesHTML;
     this.gameState = 2;
     this.options.onGameStart();
@@ -368,26 +397,69 @@
     // cache this
     var self = this;
 
-    // add correct class
-    window.setTimeout( function(){
-      self.card1.classList.add("correct");
-      self.card2.classList.add("correct");
-    }, 300 );
+    self.numMatches++;
+    if (!this.options.alwaysFlipped) {
+      // add correct class
+      window.setTimeout( function(){
+        self._markMatch();
+      }, 300 );
 
-    // remove correct class and reset vars
-    window.setTimeout( function(){
-      self.card1.classList.remove("correct");
-      self.card2.classList.remove("correct");
+      // remove correct class and reset vars
+      window.setTimeout( function(){
+        self._unmarkMatch()
+        self._gameResetVars();
+      }, 1500 );
+    } else {
+      self._markMatch();
       self._gameResetVars();
-      self.flippedTiles = self.flippedTiles + 2;
-      if (self.flippedTiles == self.numTiles) {
+    }
+    if (self._isGameWon()) {
+      window.setTimeout( function(){
         self._winGame();
-      }
-    }, 1500 );
+      }, 1500 );
+    }
 
     // plus one on the move counter
     this._gameCounterPlusOne();
   };
+
+
+  /**
+   * Memory _isGameWon
+   *
+   * Return True if all matches have been made.
+   */
+
+  Memory.prototype._isGameWon = function() {
+    var self = this;
+    return self.numMatches == self.maxNumMatches;
+  }
+
+  /**
+   * Memory _unmarkMatch
+   *
+   * This method undoes _markMatch and removes the css of correct cards.
+   */
+
+  Memory.prototype._unmarkMatch = function() {
+    var self = this;
+    self.card1.classList.remove("correct");
+    self.card2.classList.remove("correct");
+  }
+
+  /**
+   * Memory _markMatch
+   *
+   * This method updates self.card1 and self.card2 to have the css of cards
+   * that have been matched.
+   */
+
+  Memory.prototype._markMatch = function() {
+    var self = this;
+    self.card1.classList.add("correct");
+    self.card2.classList.add("correct");
+  }
+
 
   /**
    * Memory _gameCardsMismatch

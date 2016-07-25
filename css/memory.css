@@ -525,6 +525,20 @@ img {
   cursor: pointer;
 }
 
+.mg__tile--inner.alwaysflipped {
+  border: 2px solid black;
+  transition: border .1s;
+}
+
+.mg__tile--inner.alwaysflipped.flipped {
+  border: 6px solid black;
+}
+
+.mg__tile--inner.alwaysflipped.correct {
+  border-color: green;
+}
+
+
 .mg__tile--outside,
 .mg__tile--inside {
   display: block;
